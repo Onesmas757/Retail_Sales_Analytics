@@ -1,0 +1,30 @@
+column,data_type,description
+row_id,int64,Row number from the source file
+order_id,str,Unique order identifier
+order_date,datetime64[us],Date the order was placed
+ship_date,datetime64[us],Date the order was shipped
+ship_mode,str,Shipping method
+customer_id,str,Unique customer identifier
+customer_name,str,Customer name
+segment,str,"Customer segment (Consumer, Corporate, Home Office)"
+country,str,Customer country
+city,str,Customer city
+state,str,Customer state
+postal_code,str,Postal code (5-character text)
+region,str,Sales region
+product_id,str,Product identifier (not unique per product)
+category,str,Product category
+sub_category,str,Product sub-category
+product_name,str,Product name
+sales,float64,Revenue from the order line (USD)
+quantity,int64,Units sold
+discount,float64,Discount applied (0 to 1)
+profit,float64,Profit on the order line (negative = loss)
+year,int32,Year of order_date
+month,int32,Month number of order_date
+month_name,str,Abbreviated month name
+year_month,str,"Year and month label, e.g. 2016-Nov"
+year_month_sort,str,"Year-month for correct sorting, e.g. 2016-11"
+ship_days,int64,Days between order and shipping
+profit_margin_pct,float64,Profit divided by sales times 100
+is_loss,bool,True when profit is negative
