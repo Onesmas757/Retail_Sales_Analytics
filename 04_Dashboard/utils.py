@@ -106,3 +106,38 @@ def cohort_retention(df):
     ret = ret.loc[:"2015-12", 0:24]
     ret.index = ret.index.astype(str)
     return ret
+
+
+@st.cache_data
+def discount_bands(df):
+    """Sales, profit and margin by discount band."""
+    bins = [-0.01, 0, 0.10, 0.20, 0.30, 0.40, 0.50, 1.00]
+    labels = ["0%", "1-10%", "11-20%", "21-30%", "31-40%", "41-50%", "51-80%"]
+    d = df.assign(band=pd.cut(df["discount"], bins=bins, labels=labels))
+    out = d.groupby("band", observed=True).agg(lines=("sales", "size"), sales=("sales", "sum"),
+                                               profit=("profit", "sum")).reset_index()
+    out["margin_pct"] = out.profit / out.sales * 100
+    return out
+
+
+@st.cache_data
+def product_quadrants(df):
+    """Sales and profit share of the four product groups (split at median product sales and profit)."""
+    p = df.groupby("product_name").agg(sales=("sales", "sum"), profit=("profit", "sum")).reset_index()
+    sm, pm = p.sales.median(), p.profit.median()
+
+    def quad(r):
+        if r.sales >= sm and r.profit >= pm:
+            return "High sales / High profit"
+        if r.sales >= sm:
+            return "High sales / Low profit"
+        if r.profit >= pm:
+            return "Low sales / High profit"
+        return "Low sales / Low profit"
+
+    p["group"] = p.apply(quad, axis=1)
+    g = p.groupby("group").agg(products=("product_name", "count"), sales=("sales", "sum"),
+                               profit=("profit", "sum")).reset_index()
+    g["% of sales"] = g.sales / g.sales.sum() * 100
+    g["% of profit"] = g.profit / g.profit.sum() * 100
+    return g
